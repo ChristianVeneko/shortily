@@ -5,9 +5,10 @@ import { useRouter } from 'vue-router';
 const username = ref('');
 const password = ref('');
 const router = useRouter();
+const API_URL = import.meta.env.VITE_API_URL
 
 const register = async () => {
-    const response = await fetch('http://localhost:3000/api/register', {
+    const response = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username.value, password: password.value })
