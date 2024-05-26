@@ -5,7 +5,10 @@ import authRoutes from "./routes/authRoutes.js";
 import linkRoutes from "./routes/linkRoutes.js";
 
 const app = express();
-const allowedOrigins = [process.env.FRONTEND_URL];
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://shortily.vercel.app",
+];
 app.use(
   cors({
     origin: function (origin, callback) {

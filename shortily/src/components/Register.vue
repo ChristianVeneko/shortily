@@ -17,7 +17,7 @@ const register = async () => {
     const data = await response.json();
     if (data.success) {
         alert(data.message);
-        router.push('/');
+        router.push('/login');
     } else {
         alert(data.message);
     }
