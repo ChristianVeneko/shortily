@@ -6,7 +6,7 @@
             <h2 class="mt-5">Your Links</h2>
             <div v-if="links.length === 0">No links created yet.</div>
             <div v-else>
-                <LinkCard v-for="link in links" :key="link.id" :link="link" :edit-link="editLink"
+                <LinkCard v-for="link in sortedLinks" :key="link.id" :link="link" :edit-link="editLink"
                     :delete-link="deleteLink" />
             </div>
         </div>
@@ -14,16 +14,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import LinkForm from '../components/LinkForm.vue';
 import LinkCard from '../components/LinkCard.vue';
 import HeaderPage from './HeaderPage.vue';
-const API_URL = import.meta.env.VITE_API_URL
 
+const API_URL = import.meta.env.VITE_API_URL;
 const links = ref([]);
 const username = ref('');
 const router = useRouter();
+
+const sortedLinks = computed(() => {
+    return [...links.value].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+});
 
 const fetchLinks = async () => {
     const token = localStorage.getItem('token');
