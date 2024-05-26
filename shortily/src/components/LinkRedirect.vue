@@ -11,15 +11,22 @@ onMounted(async () => {
         const response = await fetch(`${API_URL}/api/links/${shortUrl}`);
         const data = await response.json();
         if (data.success) {
-            // Redirigir al enlace original sin agregar el prefijo de la aplicación
-            window.location.href = data.data.original_url;
+            let originalUrl = data.data.original_url;
+
+            // Verificar si el enlace original tiene un esquema válido y un dominio
+            const urlRegex = /^(https?:\/\/)/;
+            if (!urlRegex.test(originalUrl)) {
+                // Si no tiene un esquema válido, agregar "https://"
+                originalUrl = `https://${originalUrl}`;
+            }
+
+            // Redirigir al enlace original
+            window.location.href = originalUrl;
         } else {
             console.error(data.message);
-            // Si hay un error, puedes manejar la situación aquí
         }
     } catch (error) {
         console.error(error);
-        // Si hay un error, puedes manejar la situación aquí
     }
 });
 </script>
