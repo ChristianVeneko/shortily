@@ -40,7 +40,9 @@ const fetchLinks = async () => {
     if (data.success) {
         links.value = data.data;
     } else {
-        alert(data.message);
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        router.push('/');
     }
 };
 
