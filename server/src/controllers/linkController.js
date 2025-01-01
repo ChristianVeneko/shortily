@@ -1,6 +1,34 @@
 import { supabase } from "../services/supabaseService.js";
 import { v4 as uuidv4 } from "uuid";
 
+export const status = async (req, res) => {
+  res.status(200).json({ success: true, message: "API is running" });
+}
+
+export const mantainDatabase = async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("test")
+      .select("texto")
+
+    if (error) {
+      console.error("Error fetching data: ", error)
+      return res.status(500).json({ success: false, message: "Error fetching data", error: error.message })
+    }
+
+    if (!data || data.length === 0) { 
+      console.log("No data found in table 'test'")
+      return res.status(200).json({ success: true, message: "No data found", data: [] });
+    }
+
+    return res.status(200).json({ success: true, data })
+
+  } catch (error) {
+    console.error("Unexpected error: ", error)
+    return res.status(500).json({ success: false, message: "Unexpected error", error: error.message }) 
+  }
+}
+
 export const createLink = async (req, res) => {
   const { original_url } = req.body;
   const user_id = req.user.id;
