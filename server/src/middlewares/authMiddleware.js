@@ -3,24 +3,44 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const authMiddleware = (req, res, next) => {
-  // Verificar si se proporcionó un token en el encabezado de autorización
-  const token = req.header("Authorization");
-  if (!token) {
-    return res
-      .status(401)
-      .json({ success: false, message: "No token provided" });
-  }
+export const authenticateToken = (req, res, next) => {
+    try {
+        // Intentar obtener el token del header de autorización
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
 
-  try {
-    // Verificar el token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
-    req.user = decoded; // Adjuntar el usuario decodificado al objeto de solicitud
-    next(); // Llamar a la siguiente función de middleware
-  } catch (error) {
-    res.status(401).json({ success: false, message: token });
-  }
+        // Si no hay token, intentar obtenerlo de las cookies
+        if (!token) {
+            return res.status(401).json({ 
+                error: 'No token provided',
+                message: 'Please login to access this resource'
+            });
+        }
+
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+            if (err) {
+                if (err.name === 'TokenExpiredError') {
+                    return res.status(401).json({ 
+                        error: 'Token expired',
+                        message: 'Your session has expired. Please login again.'
+                    });
+                }
+                return res.status(401).json({ 
+                    error: 'Invalid token',
+                    message: 'Please login again'
+                });
+            }
+
+            req.user = {
+                uid: decoded.userId,
+                email: decoded.email
+            };
+            next();
+        });
+    } catch (error) {
+        return res.status(401).json({ 
+            error: 'Authentication failed',
+            message: 'Please login to continue'
+        });
+    }
 };
-
-export default authMiddleware;

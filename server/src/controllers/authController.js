@@ -1,56 +1,89 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { supabase } from "../services/supabaseService.js";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const SECRET_KEY = process.env.JWT_SECRET;
+import jwt from 'jsonwebtoken';
+import { createUser, getUserByEmail } from '../services/firebaseService.js';
 
 export const register = async (req, res) => {
-  const { username, password } = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 8);
-
   try {
-    const { data, error } = await supabase
-      .from("users")
-      .insert([{ username, password: hashedPassword }]);
-    if (error) throw error;
-    res
-      .status(200)
-      .json({ success: true, message: "User registered successfully" });
+    const { email, password, name } = req.body;
+
+    if (!email || !password || !name) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    const existingUser = await getUserByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already registered' });
+    }
+
+    const userId = await createUser({ email, password, name });
+
+    // Generar token JWT con el ID de usuario
+    const token = jwt.sign(
+      { 
+        userId: userId,  // Cambiado de uid a userId para mantener consistencia
+        email: email 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.status(201).json({
+      success: true,
+      token,
+      user: {
+        id: userId,
+        email,
+        name
+      }
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error in registration:', error);
+    res.status(500).json({ error: 'Failed to register user' });
   }
 };
 
 export const login = async (req, res) => {
-  const { username, password } = req.body;
-
   try {
-    const { data: users, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("username", username);
-    if (error) throw error;
+    const { email, password } = req.body;
 
-    if (users.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const user = users[0];
-    const passwordIsValid = bcrypt.compareSync(password, user.password);
-    if (!passwordIsValid) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid password" });
+    const user = await getUserByEmail(email);
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: 86400 });
-    res.status(200).json({ success: true, message: "Login successful", token });
+    // Generar token JWT con el ID de usuario
+    const token = jwt.sign(
+      { 
+        userId: user.id,  // Cambiado de uid a userId para mantener consistencia
+        email: user.email 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name
+      }
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error in login:', error);
+    res.status(500).json({ error: 'Failed to login' });
   }
 };

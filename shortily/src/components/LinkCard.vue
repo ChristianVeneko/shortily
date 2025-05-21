@@ -2,16 +2,19 @@
 <template>
     <div class="card mb-3">
         <div class="card-body">
-            <h5 class="card-title">{{ link.original_url }}</h5>
+            <h5 class="card-title">{{ link.originalUrl }}</h5>
             <p class="card-text">
-                Short URL: <a :href="`/r/${link.short_url}`" target="_blank">{{ link.short_url }}</a>
+                Short URL: <a :href="`/r/${link.shortCode}`" target="_blank">{{ link.shortUrl }}</a>
+            </p>
+            <p class="card-text">
+                <small class="text-muted">Clicks: {{ link.clicks || 0 }}</small>
             </p>
             <div class="d-flex justify-content-between align-items-center">
                 <div class="mr-2">
-                    <button class="btn btn-secondary btn-sm" @click="shareLink(link.short_url)">Share</button>
+                    <button class="btn btn-secondary btn-sm" @click="shareLink(link.shortCode)">Share</button>
                 </div>
                 <div class="mr-2">
-                    <button class="btn btn-secondary btn-sm" @click="copyLink(link.short_url)">Copy</button>
+                    <button class="btn btn-secondary btn-sm" @click="copyLink(link.shortCode)">Copy</button>
                 </div>
                 <div class="mr-2">
                     <button class="btn btn-primary btn-sm" @click="editLink(link)">Edit</button>
@@ -22,19 +25,17 @@
     </div>
 </template>
 
-
-
 <script setup>
 import { defineProps } from 'vue';
-const ORIGIN_URL = import.meta.env.VITE_ORIGIN_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 const props = defineProps({
     link: Object,
     editLink: Function,
     deleteLink: Function,
 });
 
-const shareLink = async (shortUrl) => {
-    const url = `${ORIGIN_URL}/r/${shortUrl}`
+const shareLink = async (shortCode) => {
+    const url = `${window.location.origin}/r/${shortCode}`;
     if (navigator.share) {
         try {
             await navigator.share({
@@ -52,8 +53,8 @@ const shareLink = async (shortUrl) => {
     }
 };
 
-const copyLink = (shortUrl) => {
-    const url = `${ORIGIN_URL}/r/${shortUrl}`
+const copyLink = (shortCode) => {
+    const url = `${window.location.origin}/r/${shortCode}`;
     navigator.clipboard.writeText(url)
         .then(() => {
             console.log('Link copied to clipboard');

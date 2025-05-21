@@ -1,23 +1,16 @@
-import { Router } from "express";
-import {
-  status,
-  createLink,
-  getLinks,
-  updateLink,
-  deleteLink,
-  getLinkByShortUrl,
-  mantainDatabase
-} from "../controllers/linkController.js";
-import authMiddleware from "../middlewares/authMiddleware.js";
+import express from 'express';
+import { createShortLink, getLink, getUserLinksList, deleteUserLink, redirectToOriginalUrl } from '../controllers/linkController.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
-const router = Router();
+const router = express.Router();
 
-router.get("/status", status)
-router.post("/links", authMiddleware, createLink);
-router.get("/links", authMiddleware, getLinks);
-router.get("/links/:shortUrl", getLinkByShortUrl);
-router.put("/links", authMiddleware, updateLink);
-router.delete("/links", authMiddleware, deleteLink);
-router.get("/test", mantainDatabase)
+// Protected routes
+router.post('/links', authenticateToken, createShortLink);
+router.get('/links', authenticateToken, getUserLinksList);
+router.delete('/links/:linkId', authenticateToken, deleteUserLink);
+
+// Public routes
+router.get('/links/:shortCode', getLink);
+router.get('/r/:shortCode', redirectToOriginalUrl);
 
 export default router;

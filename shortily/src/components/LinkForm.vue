@@ -21,31 +21,35 @@ const originalUrl = ref('');
 const emits = defineEmits(['link-created']);
 
 const createLink = async () => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/api/links`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: token,
-        },
-        body: JSON.stringify({ original_url: originalUrl.value }),
-    });
-    const data = await response.json();
-    if (data.success) {
-        const newLink = {
-            id: data.urls.id,
-            original_url: data.urls.original_url,
-            short_url: data.urls.short_url,
-        };
-        originalUrl.value = '';
-        // Emitir el evento link-created
-        emits('link-created');
-    } else {
-        alert(data.message);
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login to create links');
+            return;
+        }
+
+        const response = await fetch(`${API_URL}/api/links`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ originalUrl: originalUrl.value })
+        });
+
+        const data = await response.json();
+        if (data.link) {
+            originalUrl.value = '';
+            // Emitir el evento link-created
+            emits('link-created');
+        } else {
+            throw new Error(data.error || 'Failed to create link');
+        }
+    } catch (error) {
+        alert(error.message);
     }
 };
 </script>
-
 
 <style scoped>
 .link-form {
