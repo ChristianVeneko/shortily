@@ -29,7 +29,8 @@
                 v-for="link in links"
                 :key="link.id"
                 :link="link"
-                @delete="deleteLink"
+                :editLink="editLink"
+                :deleteLink="deleteLink"
             />
         </div>
     </div>
@@ -93,7 +94,55 @@ const fetchLinks = async () => {
     }
 };
 
+const editLink = async (link) => {
+    const newUrl = prompt('Enter the new URL:', link.originalUrl);
+    if (!newUrl || newUrl === link.originalUrl) {
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No authentication token found');
+        }
+
+        const response = await fetch(`${API_URL}/api/links/${link.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ originalUrl: newUrl })
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                router.push('/login');
+                return;
+            }
+            throw new Error('Failed to update link');
+        }
+
+        // Actualizar el link en la lista
+        const index = links.value.findIndex(l => l.id === link.id);
+        if (index !== -1) {
+            links.value[index] = {
+                ...links.value[index],
+                originalUrl: newUrl
+            };
+        }
+    } catch (err) {
+        error.value = err.message;
+    }
+};
+
 const deleteLink = async (linkId) => {
+    if (!confirm('Are you sure you want to delete this link?')) {
+        return;
+    }
+
     try {
         const token = localStorage.getItem('token');
         if (!token) {
