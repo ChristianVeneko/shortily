@@ -3,6 +3,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+//debugging
+console.log("FIREBASE_PRIVATE_KEY from env:", process.env.FIREBASE_PRIVATE_KEY);
+
 // Inicializar Firebase Admin
 admin.initializeApp({
   credential: admin.credential.cert({
