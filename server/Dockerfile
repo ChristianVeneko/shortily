@@ -13,8 +13,7 @@ WORKDIR /app
 ENV NODE_ENV="production"
 
 # Install packages needed to build node modules
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+RUN apk add --no-cache build-base python3
 
 # Install node modules
 COPY package*.json ./
@@ -22,9 +21,6 @@ RUN npm install
 
 # Copy application code
 COPY . .
-
-# Copy frontend build files
-COPY ../dist ./public
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
