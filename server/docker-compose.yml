@@ -8,4 +8,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - FIREBASE_PROJECT_ID=shortily-36fdc
+      - FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDC92gDh1VO9uyR\njXl/XOoey/6J2e9t2MduQh59qhx4txJ0cfc0BzDIO74RGtCZVvZRdViQ1SjZmev9\nuti8cC0EkSDDij9KblKisl+8mg2vF/Ij7NNN9uZuugJEC1OAWHOuB3s0V50PiLzf\n0ttFvFleoBWgqm1ZV9Zd8ovzv3zkcMP5Uq/p2P3k5CBIVvtK5eTS0LFYjojwPCZR\nSe3vV2U3kLZTNGHt8jfhvctrJNQyKGJW7cd5yPLSDifr24W7taw6+p9bNktUePWO\n4FtgMXNgc6hzZY/LMotwvqgwKMXgDokELdOqDWg0CqUhRn02S7YxZMGkrVLm5P+4\npscDyXYLAgMBAAECggEAH/X946IyXm0FMAEwuyvIp37Kfd+vq+K/IriNFg2meDWO\nvW8XVrydBx4gFN6/9ns2ivkBKVEATte4Q5J3SEDdaGPAKr4FjRaTzl8OabUZbCwx\nQilnJF9GvD0a9PukVyRo5k0MqfJ46VyBlfGTh5WOUwBMO1fk8CIBnsoNnko0V6BI\n4Qx731b72sGl9UnXlKuGoVsSz0roA1E5CuSBKHz2xmhUDIgJwdjrUl6G3AQKNI4H\nJh4AlcnZXabzNKoiOVW5251G6eVOxBXt/C2SHOPisZS3ZIqj2uVbDClvIHipGfWa\nGlkxWDy/0S9YXUKWynadt3cQufyrL+Yc9VOnGfXVkQKBgQD/VvOVdrusilW5/kTe\nn/2GzKhbToq155ID7S0s+ZLkiQsmN3y4C4/gHh32t5+CYaQARgaeLCY8imk5WtWm\n3o/8NRpWfQWy43E81wpeRqkq2HOI2x+AWAAjUCJ27wiYI35qxxPRxjqInSDsv+ZN\nGF2BtmrJcKJZav9HGXipFSlcMQKBgQDDeHwIZ2T3DOlV3HcNUmUKwjfSEaWTbj1B\nBQk5pp5oITF5Qp17NRB5+Y0xDxh3Y7wvKknahQ/aqm3bJMZGe3O+pTyqoa8xE55K\nkaZNGrlL2B0TVDgWZSUivSCNVFYf1HIwLr/3oiyiL3VRSNJcPuxObXJ3CliCBNTw\nABZitcKy+wKBgQCDhmiGTtixMbiiy8Tx3/uZ2gXGsphkxtnByAQDLLNroOPrVZ2a\nt+nuidTpZwB1CpKNyYRTKW6wtKMq9g0jnXURdtEQR+oNkXac3i/rC/7LoR8yGZ0K\nYUoA5qA6HzqQE4hkvBMLdU5lXHq/OMIKaEiSLkKnbKtT3/eKyiYLAmmBoQKBgFMi\nThZA6zcLXb3vuw6GaYTu31DPwoz2iMS7gJXtYFfHLkR1aYb6JZzK3xrrYat9Vo70\nvF5c00Zbz8cxV8aoQKznl+q2Q01rG5p5YbJPWFmCe7M50XTs5aNlro+NO+fjsgD+\nERUf+z2rU4kToKws8tHUSKeKVeROa8X7M4od5cW7AoGBALXc3vkH8gcm3CJYt+gg\njVmlVCAXvua2f7QbW/BmmWfuV+gjf+EF7VcYA7a4s7r7/d+vFl5vGd9/1SefhTW/\neYU4iqoOFrQqTvLHAZDfunfy2veJNxFgKqIATajFLNGd6YLw6rgBJml8dh/FMhYw\nN78YG/xM8j+aWb5vPn4uu4TY\n-----END PRIVATE KEY-----\n"
+      - FIREBASE_CLIENT_EMAIL=firebase-adminsdk-fbsvc@shortily-36fdc.iam.gserviceaccount.com
+      - JWT_SECRET=Elpepe666.com
+      - BASE_URL=https://ec2-3-16-48-99.us-east-2.compute.amazonaws.com
+      - FRONTEND_URL=https://shortily.vercel.app
     restart: always 
