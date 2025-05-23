@@ -62,12 +62,8 @@ export const getUserByEmail = async (email) => {
 
 // Funciones para manejo de enlaces
 export const createLink = async (originalUrl, userId) => {
-  if (!userId) {
-    throw new Error('User ID is required');
-  }
-
-  if (!originalUrl) {
-    throw new Error('Original URL is required');
+  if (!userId || !originalUrl) {
+    throw new Error('User ID and URL are required');
   }
 
   try {
@@ -84,7 +80,6 @@ export const createLink = async (originalUrl, userId) => {
       originalUrl: formattedUrl,
       shortCode,
       userId,
-      clicks: 0,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     };
@@ -156,6 +151,41 @@ export const deleteLink = async (linkId) => {
     await linkRef.delete();
   } catch (error) {
     console.error('Error deleting link:', error);
+    throw error;
+  }
+};
+
+export const updateLink = async (linkId, updateData) => {
+  if (!linkId || !updateData?.originalUrl) {
+    throw new Error('Link ID and URL are required');
+  }
+
+  try {
+    const linkRef = db.collection('links').doc(linkId);
+    const linkDoc = await linkRef.get();
+
+    if (!linkDoc.exists) {
+      throw new Error('Link not found');
+    }
+
+    // Asegurarse de que la URL tenga el protocolo correcto
+    let formattedUrl = updateData.originalUrl;
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = 'https://' + formattedUrl;
+    }
+
+    await linkRef.update({
+      originalUrl: formattedUrl,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    
+    const updatedDoc = await linkRef.get();
+    return {
+      id: updatedDoc.id,
+      ...updatedDoc.data()
+    };
+  } catch (error) {
+    console.error('Error updating link:', error);
     throw error;
   }
 }; 

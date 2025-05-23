@@ -1,4 +1,4 @@
-import { createLink, getLinkByShortCode, getUserLinks, deleteLink } from '../services/firebaseService.js';
+import { createLink, getLinkByShortCode, getUserLinks, deleteLink, updateLink } from '../services/firebaseService.js';
 import * as admin from 'firebase-admin';
 
 export const createShortLink = async (req, res) => {
@@ -17,7 +17,6 @@ export const createShortLink = async (req, res) => {
                 originalUrl: link.originalUrl,
                 shortCode: link.shortCode,
                 shortUrl: `${process.env.BASE_URL}/r/${link.shortCode}`,
-                clicks: link.clicks || 0,
                 createdAt: link.createdAt,
                 updatedAt: link.updatedAt
             }
@@ -38,8 +37,7 @@ export const getLink = async (req, res) => {
                 id: link.id,
                 originalUrl: link.originalUrl,
                 shortCode: link.shortCode,
-                shortUrl: `${process.env.BASE_URL}/r/${link.shortCode}`,
-                clicks: link.clicks || 0
+                shortUrl: `${process.env.BASE_URL}/r/${link.shortCode}`
             }
         });
     } catch (error) {
@@ -58,7 +56,6 @@ export const getUserLinksList = async (req, res) => {
             originalUrl: link.originalUrl,
             shortCode: link.shortCode,
             shortUrl: `${process.env.BASE_URL}/r/${link.shortCode}`,
-            clicks: link.clicks || 0,
             createdAt: link.createdAt,
             updatedAt: link.updatedAt
         }));
@@ -101,13 +98,38 @@ export const redirectToOriginalUrl = async (req, res) => {
             redirectUrl = 'https://' + redirectUrl;
         }
 
-        await link.ref.update({
-            clicks: admin.firestore.FieldValue.increment(1),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-
         res.redirect(redirectUrl);
     } catch (error) {
         res.status(500).json({ error: 'Failed to redirect' });
+    }
+};
+
+export const updateUserLink = async (req, res) => {
+    try {
+        const { linkId } = req.params;
+        const { originalUrl } = req.body;
+        const userId = req.user.uid;
+
+        if (!userId) return res.status(401).json({ error: 'User not authenticated' });
+        if (!originalUrl) return res.status(400).json({ error: 'URL is required' });
+
+        const link = await getLinkByShortCode(linkId);
+        if (!link) return res.status(404).json({ error: 'Link not found' });
+        if (link.userId !== userId) return res.status(403).json({ error: 'Not authorized to update this link' });
+
+        const updatedLink = await updateLink(linkId, { originalUrl });
+        res.json({ 
+            success: true, 
+            link: {
+                id: updatedLink.id,
+                originalUrl: updatedLink.originalUrl,
+                shortCode: updatedLink.shortCode,
+                shortUrl: `${process.env.BASE_URL}/r/${updatedLink.shortCode}`,
+                createdAt: updatedLink.createdAt,
+                updatedAt: updatedLink.updatedAt
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update link' });
     }
 };
