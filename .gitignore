@@ -46,6 +46,4 @@ build/
 *.ntvs*
 *.njsproj
 *.sln
-server/.dockerignore
-server/Dockerfile
 server/fly.toml
