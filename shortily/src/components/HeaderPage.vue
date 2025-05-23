@@ -2,7 +2,7 @@
 <template>
     <header class="header">
         <h1>{{ pageTitle }}</h1>
-        <div class="user-info">
+        <div v-if="username" class="user-info">
             <p>Welcome, {{ username }}</p>
             <button @click="logout">Logout</button>
         </div>
@@ -10,27 +10,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
-const pageTitle = ref('');
-const username = ref('');
+const pageTitle = ref('Shortily'); // Simplified title
 const router = useRouter();
+
+const username = computed(() => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return user.name || ''; // Get name from the user object
+});
 
 const logout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    router.push('/');
+    localStorage.removeItem('user'); // Remove the user object
+    // localStorage.removeItem('username'); // Remove if this was used previously, otherwise can remove
+    router.push('/login');
 };
 
-// Update page title and retrieve username from localStorage
+// Update page title on mounted (optional, title is now static)
 onMounted(() => {
-    pageTitle.value = 'Shortily Dashboard'; // Set page title
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-        username.value = storedUsername;
-    }
+    // pageTitle.value = 'Shortily Dashboard'; // Static title set above
 });
+
 </script>
 
 <style scoped>

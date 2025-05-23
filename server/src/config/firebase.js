@@ -54,7 +54,7 @@ const verifyConnection = async () => {
     console.error('Error al conectar con Firestore o leer documento de prueba:', error);
     // No lanzar error aquí si solo es un documento de prueba faltante, solo si la conexión falla.
     if (error.code !== 'not-found') {
-       //throw error; // Lanzar solo si el error no es simplemente que el documento no existe
+
     }
   }
 };
